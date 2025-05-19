@@ -8,8 +8,8 @@ from tkinter import Tk, filedialog
 st.set_page_config(page_title="📑 Tabular Viewer", layout="wide")
 def select_directory():
     root = Tk()
-    root.withdraw()  # Скрыть основное окно
-    root.attributes('-topmost', True)  # Окно поверх других
+    root.withdraw()  
+    root.attributes('-topmost', True) 
     folder_path = filedialog.askdirectory(title="Виберіть каталог з даними")
     root.destroy()
     return folder_path
@@ -131,13 +131,11 @@ def find_matching_metadata(data_filename, df, specs):
 
 @st.cache_data
 def describe_column(col, metadata_df, _meta):
-    # Попытка найти описание из внешней таблицы спецификации
     if metadata_df is not None and "Variable" in metadata_df.columns:
         row = metadata_df[metadata_df["Variable"] == col]
         if not row.empty:
             return row.iloc[0].to_dict()
 
-    # Если есть pyreadstat.meta — извлекаем оттуда
     desc = {}
     if _meta:
         if hasattr(_meta, "column_names_to_labels"):
@@ -146,19 +144,13 @@ def describe_column(col, metadata_df, _meta):
             desc["Type"] = _meta.readstat_variable_types.get(col, "")
         if hasattr(_meta, "variable_storage_width"):
             desc["Length"] = _meta.variable_storage_width.get(col, "")
-        # Проверка на возможное поле format в будущем (его пока нет в pyreadstat)
         if hasattr(_meta, "formats"):
             desc["Format"] = _meta.formats.get(col, "")
     return desc if desc else None
 
-
-
 df, meta = load_data_with_meta(selected)
 all_specs = load_all_metadata()
 matched_metadata = find_matching_metadata(selected, df, all_specs) if df is not None else None
-
-
-
 
 tab1, tab2 = st.tabs(["📋 Метаданi","📄 Данi"])
 
